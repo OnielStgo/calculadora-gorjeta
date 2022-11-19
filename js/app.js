@@ -35,7 +35,12 @@ function salvarCliente() {
 
   }
   
-  console.log('Campos preechidos corretamente');
+  //adicionar os dados do formulário ao objeto cliente
+  cliente = {...cliente, mesa, hora};
 
-    
+  //fechar o modal
+  const modal = document.querySelector('.modal');
+  const modalInstancia = bootstrap.Modal.getInstance(modal);
+  modalInstancia.hide();
+
 }
