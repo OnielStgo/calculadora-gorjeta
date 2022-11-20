@@ -99,6 +99,11 @@ function mostrarPlatilhos(platilhos){
     inputCantidad.min = 0;
     inputCantidad.id = `produto-${platilho.id}`;
 
+    inputCantidad.onclick = function(){
+      const cantidad = inputCantidad.value;
+      adicionarPlatilho({...platilho, cantidad})
+    }
+
     const caixaDoInput = document.createElement('div');
     caixaDoInput.classList.add('col-md-2');
     caixaDoInput.appendChild(inputCantidad);
@@ -110,4 +115,138 @@ function mostrarPlatilhos(platilhos){
 
     conteudo.appendChild(row);
   })
+}
+
+function adicionarPlatilho(produto){
+  //extrair o pedido atual
+  let { pedido } = cliente;
+
+  //verificar que a quantidade seja maior que 0
+  if(produto.cantidad > 0){
+
+    //verificar se o platilho já existe no pedido
+    if(pedido.some(articulo => articulo.id === produto.id)){
+
+      //o platilho já existe, agora atualizo a quantidade
+      const pedidoAtualizado = pedido.map(platilho => {
+        if(platilho.id === produto.id){
+          platilho.cantidad = produto.cantidad
+          //console.log(platilho.cantidad);
+        }
+        return platilho;
+      });
+      //adicionadmos o pedidoAtualizado a cliente.pedido
+      cliente.pedido = [...pedidoAtualizado]
+    } else {
+      cliente.pedido = [...pedido, produto];
+    }
+     
+  } else {
+    //eliminar platilho se sua propiedade quantidade é igual a 0
+    const listaPlatilhos = pedido.filter(platilho => platilho.id !== produto.id)
+    cliente.pedido = [...listaPlatilhos]
+  }
+
+  //limpar o código html anterior do pedido
+  limparHTML();
+
+  //mostrar o resumo do pedido
+  atualizarResumo();
+}
+
+function atualizarResumo(){
+  const conteudo = document.querySelector('#resumen .contenido');
+
+  const resumo = document.createElement('div');
+  resumo.classList.add('col-md-6', 'card', 'py-5', 'px-3', 'shadow');
+
+  //informação da mesa
+  const mesa = document.createElement('p');
+  mesa.classList.add('fw-bold');
+  mesa.textContent = 'Mesa: ';
+
+  const mesaSpan = document.createElement('span');
+  mesaSpan.classList.add('fw-normal');
+  mesaSpan.textContent = cliente.mesa;
+
+  //informação da hora
+  const hora = document.createElement('p');
+  hora.classList.add('fw-bold');
+  hora.textContent = 'Hora: ';
+
+  const horaSpan = document.createElement('span');
+  horaSpan.classList.add('fw-normal');
+  horaSpan.textContent = cliente.hora;
+
+  mesa.appendChild(mesaSpan);
+  hora.appendChild(horaSpan);
+
+  //titulo da seção
+  const heading = document.createElement('h3');
+  heading.classList.add('my-4', 'text-center');
+  heading.textContent = 'Platilhos consumidos';
+
+  //iterar sobre os o array de platilhos
+  const grupo = document.createElement('ul');
+  grupo.classList.add('list-group');
+
+  const { pedido } = cliente;
+
+  pedido.forEach(articulo => {
+    const { nombre, precio, id, cantidad } = articulo;
+
+    const elementoDaLista = document.createElement('li');
+    elementoDaLista.classList.add('list-group-item');
+
+    const nombreDoElemento = document.createElement('h4');
+    nombreDoElemento.classList.add('my-4');
+    nombreDoElemento.textContent = nombre;
+
+    //quantidade do itens
+    const quantidadeElemento = document.createElement('p');
+    quantidadeElemento.classList.add('fw-bold');
+    quantidadeElemento.textContent = 'Quantidade: ';
+
+    const quantidadeValor = document.createElement('span');
+    quantidadeValor.classList.add('fw-normal');
+    quantidadeValor.textContent = cantidad;
+    
+    //preço do item
+    const precoElemento = document.createElement('p');
+    precoElemento.classList.add('fw-bold');
+    precoElemento.textContent = 'Preço: ';
+
+    const precoValor = document.createElement('span');
+    precoValor.classList.add('fw-normal');
+    precoValor.textContent = `$${precio}`;
+
+    //adicionar valores dentro de seus contenedores
+    quantidadeElemento.appendChild(quantidadeValor);
+    precoElemento.appendChild(precoValor);
+
+
+    //adicionar elementos ao li
+    elementoDaLista.appendChild(nombreDoElemento);
+    elementoDaLista.appendChild(quantidadeElemento);
+    elementoDaLista.appendChild(precoElemento);
+
+    //adicionar lista ao grupo principal
+    grupo.appendChild(elementoDaLista);
+  })
+
+
+  resumo.appendChild(mesa); 
+  resumo.appendChild(hora);
+  resumo.appendChild(heading);
+  resumo.appendChild(grupo);
+
+  conteudo.appendChild(resumo);
+}
+
+function limparHTML(){
+  const conteudo = document.querySelector('#resumen .contenido');
+
+  while (conteudo.firstChild) {
+    conteudo.removeChild(conteudo.firstChild);
+  }
 }
