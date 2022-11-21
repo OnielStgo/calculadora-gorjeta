@@ -150,8 +150,14 @@ function adicionarPlatilho(produto){
   //limpar o código html anterior do pedido
   limparHTML();
 
-  //mostrar o resumo do pedido
-  atualizarResumo();
+  if(cliente.pedido.length){
+    //mostrar o resumo do pedido
+    atualizarResumo();
+  } else {
+    mensagemPedidoVacio();
+  }
+
+  
 }
 
 function atualizarResumo(){
@@ -277,6 +283,7 @@ function calcularSubtotal(precio, cantidad){
   return `$${precio * cantidad}`;
 }
 
+
 function removerProduto(id){
   const { pedido } = cliente;
 
@@ -285,7 +292,29 @@ function removerProduto(id){
   
   //limpar o código html anterior do pedido
   limparHTML();
+  
 
-  //mostrar o resumo do pedido
-  atualizarResumo();
+  if(cliente.pedido.length){
+    //mostrar o resumo do pedido
+    atualizarResumo();
+  } else {
+    mensagemPedidoVacio();
+  }
+
+  //o produto se eliminou portanto a devemos colocar a quantidade a 0 no formulário
+  const produtoRemovido = `#produto-${id}`;
+  const inputRemovido = document.querySelector(produtoRemovido);
+  inputRemovido.value = 0;
+}
+
+
+function mensagemPedidoVacio(){
+  const conteudo = document.querySelector('#resumen .contenido');
+
+  const texto = document.createElement('p');
+  texto.classList.add('text-center');
+  texto.textContent = 'Adiciona os elementos do pedido';
+
+  conteudo.appendChild(texto);
+
 }
