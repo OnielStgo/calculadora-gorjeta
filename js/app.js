@@ -342,6 +342,7 @@ function formularioGorjetas(){
   radio10.name = 'gorjeta';
   radio10.value = '10';
   radio10.classList.add('form-check-input');
+  radio10.onclick = calcularGorjeta;
 
   const radio10Label = document.createElement('label');
   radio10Label.textContent = '10%';
@@ -353,12 +354,13 @@ function formularioGorjetas(){
   radio10Div.appendChild(radio10);
   radio10Div.appendChild(radio10Label);
 
-  //radio button 20%
+  //radio button 25%
   const radio25 = document.createElement('input');
   radio25.type = 'radio';
   radio25.name = 'gorjeta';
   radio25.value = '25';
   radio25.classList.add('form-check-input');
+  radio25.onclick = calcularGorjeta;
 
   const radio25Label = document.createElement('label');
   radio25Label.textContent = '25%';
@@ -376,6 +378,8 @@ function formularioGorjetas(){
   radio50.name = 'gorjeta';
   radio50.value = '50';
   radio50.classList.add('form-check-input');
+  radio50.onclick = calcularGorjeta;
+
 
   const radio50Label = document.createElement('label');
   radio50Label.textContent = '50%';
@@ -398,4 +402,80 @@ function formularioGorjetas(){
 
   conteudo.appendChild(formulario);
 
+}
+
+function calcularGorjeta(){
+  const { pedido } = cliente;
+  let subTotal = 0;
+
+  //calcular o subtotal a pagar
+  pedido.forEach(item => {
+    subTotal += item.precio * item.cantidad;
+  })
+
+  //selecionar o radio button com a gorjeta selecionada
+  const gorjetaSelecionada = document.querySelector('[name="gorjeta"]:checked').value;
+
+  //calcular gorjeta
+  const gorjeta = (subTotal * parseInt(gorjetaSelecionada)) / 100;
+  
+  //calcular total a pagar
+  const total = subTotal + gorjeta;
+  
+  mostrarTotalHTML(subTotal, gorjeta, total);
+}
+
+function mostrarTotalHTML(subTotal, gorjeta, total){
+  const divTotais = document.createElement('div');
+  divTotais.classList.add('total-pagar', 'my-5')
+
+  //subtotal
+  const subTotalParrafo = document.createElement('p');
+  subTotalParrafo.classList.add('fs-4', 'fw-bold', 'mt-2');
+  subTotalParrafo.textContent = 'Subtotal consumo: ';
+
+  const subTotalSpan = document.createElement('span');
+  subTotalSpan.classList.add('fw-normal');
+  subTotalSpan.textContent = `$${subTotal}`;
+
+  subTotalParrafo.appendChild(subTotalSpan);
+
+
+   //gorjeta
+   const gorjetaParrafo = document.createElement('p');
+   gorjetaParrafo.classList.add('fs-4', 'fw-bold', 'mt-2');
+   gorjetaParrafo.textContent = 'Gorjeta: ';
+ 
+   const gorjetaSpan = document.createElement('span');
+   gorjetaSpan.classList.add('fw-normal');
+   gorjetaSpan.textContent = `$${gorjeta}`;  
+ 
+   gorjetaParrafo.appendChild(gorjetaSpan);
+
+
+   //total
+   const totalParrafo = document.createElement('p');
+   totalParrafo.classList.add('fs-4', 'fw-bold', 'mt-2');
+   totalParrafo.textContent = 'Total a pagar: ';
+ 
+   const totalSpan = document.createElement('span');
+   totalSpan.classList.add('fw-normal');
+   totalSpan.textContent = `$${total}`;  
+ 
+   totalParrafo.appendChild(totalSpan);
+
+   //atualizar total a pagar
+   const totalPagarDiv = document.querySelector('.total-pagar');
+   if(totalPagarDiv){
+    totalPagarDiv.remove();
+   }
+
+
+  divTotais.appendChild(subTotalParrafo);
+  divTotais.appendChild(gorjetaParrafo);
+  divTotais.appendChild(totalParrafo);
+
+  const formulario = document.querySelector('.formulario > div');
+  formulario.appendChild(divTotais);
+  
 }
